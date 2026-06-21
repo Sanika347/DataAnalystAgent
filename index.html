@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Analyst Agent - Interactive Business Insights</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- PapaParse for CSV parsing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <!-- Chart.js for premium charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <!-- API Key Configuration Modal -->
+  <div id="api-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>API Configuration</h3>
+        <button id="close-modal-btn" class="btn" style="border:none; padding:4px;"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="api-key-input">Gemini API Key</label>
+          <input type="password" id="api-key-input" class="form-control" placeholder="Enter your Gemini API key (optional)">
+          <small style="color: var(--text-light); margin-top: 6px; display: block; line-height:1.4;">
+            Your key is saved locally in your browser's <code>localStorage</code> and never sent to external servers other than directly to the Gemini API endpoint.
+          </small>
+        </div>
+        <div class="form-group">
+          <label for="api-model-select">AI Engine Model</label>
+          <select id="api-model-select" class="form-control">
+            <option value="gemini-1.5-flash">Gemini 1.5 Flash (Fast, Recommended)</option>
+            <option value="gemini-1.5-pro">Gemini 1.5 Pro (Deep reasoning)</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="clear-api-btn" class="btn">Clear Key</button>
+        <button id="save-api-btn" class="btn btn-primary">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar-nav" style="display: none;">
+      <div class="logo-section">
+        <div class="logo-icon">DA</div>
+        <div class="logo-text">AnalystAgent</div>
+      </div>
+      
+      <ul class="steps-list">
+        <li class="step-item active" data-step="1" id="step-btn-1">
+          <span class="step-number">1</span>
+          <span class="step-name">Load Data</span>
+          <span class="step-status-icon"><i data-lucide="check-circle-2" style="width:14px; height:14px;"></i></span>
+        </li>
+        <li class="step-item" data-step="2" id="step-btn-2">
+          <span class="step-number">2</span>
+          <span class="step-name">Inspect Dataset</span>
+          <span class="step-status-icon"><i data-lucide="check-circle-2" style="width:14px; height:14px;"></i></span>
+        </li>
+        <li class="step-item" data-step="3" id="step-btn-3">
+          <span class="step-number">3</span>
+          <span class="step-name">Data Cleaning</span>
+          <span class="step-status-icon"><i data-lucide="check-circle-2" style="width:14px; height:14px;"></i></span>
+        </li>
+        <li class="step-item" data-step="4" id="step-btn-4">
+          <span class="step-number">4</span>
+          <span class="step-name">Data Quality Check</span>
+          <span class="step-status-icon"><i data-lucide="check-circle-2" style="width:14px; height:14px;"></i></span>
+        </li>
+        <li class="step-item" data-step="5" id="step-btn-5">
+          <span class="step-number">5</span>
+          <span class="step-name">EDA</span>
+          <span class="step-status-icon"><i data-lucide="check-circle-2" style="width:14px; height:14px;"></i></span>
+        </li>
+        <li class="step-item" data-step="6" id="step-btn-6">
+          <span class="step-number">6</span>
+          <span class="step-name">Visualizations</span>
+          <span class="step-status-icon"><i data-lucide="check-circle-2" style="width:14px; height:14px;"></i></span>
+        </li>
+        <li class="step-item" data-step="7" id="step-btn-7">
+          <span class="step-number">7</span>
+          <span class="step-name">Feature Engineering</span>
+          <span class="step-status-icon"><i data-lucide="check-circle-2" style="width:14px; height:14px;"></i></span>
+        </li>
+        <li class="step-item" data-step="8" id="step-btn-8">
+          <span class="step-number">8</span>
+          <span class="step-name">Answer Business Questions</span>
+          <span class="step-status-icon"><i data-lucide="check-circle-2" style="width:14px; height:14px;"></i></span>
+        </li>
+        <li class="step-item" data-step="9" id="step-btn-9">
+          <span class="step-number">9</span>
+          <span class="step-name">Statistical Analysis</span>
+          <span class="step-status-icon"><i data-lucide="check-circle-2" style="width:14px; height:14px;"></i></span>
+        </li>
+        <li class="step-item" data-step="10" id="step-btn-10">
+          <span class="step-number">10</span>
+          <span class="step-name">Create Dashboard</span>
+          <span class="step-status-icon"><i data-lucide="check-circle-2" style="width:14px; height:14px;"></i></span>
+        </li>
+        <li class="step-item" data-step="11" id="step-btn-11">
+          <span class="step-number">11</span>
+          <span class="step-name">Generate Insights</span>
+          <span class="step-status-icon"><i data-lucide="check-circle-2" style="width:14px; height:14px;"></i></span>
+        </li>
+        <li class="step-item" data-step="12" id="step-btn-12">
+          <span class="step-number">12</span>
+          <span class="step-name">Give Recommendations</span>
+          <span class="step-status-icon"><i data-lucide="check-circle-2" style="width:14px; height:14px;"></i></span>
+        </li>
+      </ul>
+      
+      <div class="sidebar-footer">
+        <div class="api-status-card">
+          <div style="display: flex; justify-content: space-between; align-items:center;">
+            <span class="status-badge" id="api-status-badge">
+              <span class="status-dot gray" id="api-status-dot"></span>
+              <span id="api-status-text">Local Mode</span>
+            </span>
+            <button id="open-settings-btn" class="btn" style="padding: 2px 6px; font-size: 0.7rem;"><i data-lucide="settings" style="width:12px; height:12px;"></i></button>
+          </div>
+          <p style="color: var(--text-light); line-height: 1.3; font-size: 0.7rem;" id="api-description">
+            Provide a Gemini key in settings to unlock AI answer outputs, advanced dashboards, and reasoning.
+          </p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="main-workspace">
+      
+      <!-- Top Navigation Header -->
+      <header class="top-header">
+        <div class="header-title-area">
+          <h2 id="header-filename">Data Analyst Agent</h2>
+          <p id="header-summary">Please upload a dataset to begin the analysis pipeline.</p>
+        </div>
+        <div class="action-buttons">
+          <button id="reset-btn" class="btn" style="display: none;"><i data-lucide="rotate-ccw"></i> Restart</button>
+          <button id="export-btn" class="btn btn-primary" style="display: none;"><i data-lucide="download"></i> Export Report</button>
+        </div>
+      </header>
+      
+      <!-- Main Content Split -->
+      <div class="content-body">
+        
+        <!-- Interactive Steps Work Area -->
+        <div class="canvas-panel" id="canvas-panel">
+          
+          <!-- Step 0: File Setup & Objectives Questionnaire -->
+          <div class="upload-container" id="setup-view">
+            
+            <div class="logo-section" style="justify-content: center; border: none; padding-bottom: 0;">
+              <div class="logo-icon" style="width: 48px; height: 48px; font-size: 1.5rem;">DA</div>
+              <h1 style="font-size: 1.8rem;">Data Analyst Agent</h1>
+            </div>
+            
+            <p style="text-align: center; color: var(--text-muted); margin-top: -16px; margin-bottom: 8px;">
+              Upload any CSV, define your goals, and let the agent parse, clean, model, and report insights.
+            </p>
+            
+            <div class="card">
+              <div class="card-title"><i data-lucide="upload-cloud" style="color: var(--primary);"></i> 1. Upload CSV Dataset</div>
+              <div class="drag-zone" id="drop-zone">
+                <i data-lucide="file-spreadsheet" class="upload-icon"></i>
+                <h4 style="margin-bottom: 8px;">Drag & Drop CSV file here</h4>
+                <p style="color: var(--text-light); font-size: 0.85rem; margin-bottom: 12px;">or click to select from your files</p>
+                <input type="file" id="csv-file-input" accept=".csv" style="display: none;">
+                <button type="button" id="browse-btn" class="btn">Browse Files</button>
+                <div id="file-info" style="margin-top: 14px; font-weight: 600; color: var(--success); display: none;"></div>
+              </div>
+            </div>
+            
+            <div class="card" id="form-card" style="display: none;">
+              <div class="card-title"><i data-lucide="align-left" style="color: var(--secondary);"></i> 2. Define Analysis Objectives</div>
+              <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">
+                Before starting the analysis, align the Agent with your business expectations.
+              </p>
+              
+              <div class="form-group">
+                <label for="input-objective">What is the objective of this analysis?</label>
+                <textarea id="input-objective" class="form-control" placeholder="e.g., Identify sales trends to maximize revenue for Q3 2026, or figure out product return drivers."></textarea>
+              </div>
+              
+              <div class="form-group">
+                <label for="input-questions">What business questions need to be answered?</label>
+                <textarea id="input-questions" class="form-control" placeholder="e.g., Which product categories are most profitable? Does seasonality impact conversion rates? (One per line)"></textarea>
+              </div>
+              
+              <div class="form-group">
+                <label for="input-decisions">What decisions will be made from this analysis?</label>
+                <textarea id="input-decisions" class="form-control" placeholder="e.g., Adjust inventory levels for top products, reallocate marketing budgets to peak days, redesign refund flow."></textarea>
+              </div>
+              
+              <button id="start-analysis-btn" class="btn btn-primary" style="width: 100%; padding: 12px;">
+                Initialize Agent Analysis Pipeline <i data-lucide="arrow-right"></i>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Dynamic Step Display (Populated by JavaScript) -->
+          <div id="step-output-container" style="display: none;">
+            <!-- Agent banner context -->
+            <div class="agent-banner" id="agent-context-banner">
+              <div class="agent-avatar" id="agent-avatar-icon">🤖</div>
+              <div class="agent-speech">
+                <h4 id="agent-header-title">Analyzing dataset...</h4>
+                <p id="agent-header-text">I am reviewing the loaded csv file columns to configure structure metadata.</p>
+              </div>
+            </div>
+            
+            <!-- Step output card content -->
+            <div class="card" style="margin-top: 24px; min-height: 380px;" id="step-card-content">
+              <!-- Content gets injected dynamically here -->
+            </div>
+            
+            <!-- Lower Stepper Navigation Buttons -->
+            <div class="nav-footer">
+              <button id="prev-step-btn" class="btn"><i data-lucide="chevron-left"></i> Previous Step</button>
+              <div style="font-size: 0.85rem; color: var(--text-muted);" id="step-indicator-text">Step 1 of 12</div>
+              <button id="next-step-btn" class="btn btn-primary">Proceed to Step 2 <i data-lucide="chevron-right"></i></button>
+            </div>
+          </div>
+          
+        </div>
+        
+        <!-- Live Compile Final Report Drawer -->
+        <section class="report-panel" id="report-drawer" style="display: none;">
+          <div class="report-header">
+            <h3>Live Final Report</h3>
+            <span style="font-size: 0.75rem; color: var(--text-muted); background: var(--bg-tertiary); padding: 4px 8px; border-radius: 12px; font-weight: 500;">
+              Document Compilation
+            </span>
+          </div>
+          <div class="report-content" id="report-document">
+            <h2 class="report-title" id="report-doc-title">Project Data Analysis Report</h2>
+            
+            <div class="report-section" id="report-sec-objective">
+              <h4><i data-lucide="target" style="width: 14px; height: 14px;"></i> Objective & Goals</h4>
+              <div class="report-item"><strong>Objective:</strong> <span id="rep-objective-text">Pending initialization...</span></div>
+              <div class="report-item"><strong>Key Questions:</strong> <span id="rep-questions-text">Pending initialization...</span></div>
+              <div class="report-item"><strong>Actionable Decisions:</strong> <span id="rep-decisions-text">Pending initialization...</span></div>
+            </div>
+            
+            <div class="report-section" id="report-sec-dataset" style="display: none;">
+              <h4><i data-lucide="database" style="width: 14px; height: 14px;"></i> Dataset Profile</h4>
+              <div class="report-item"><strong>Dimensions:</strong> <span id="rep-dimensions-text">-</span></div>
+              <div class="report-item"><strong>Format & Size:</strong> <span id="rep-size-text">-</span></div>
+              <div class="report-item"><strong>Schema Detected:</strong> <span id="rep-schema-text">-</span></div>
+            </div>
+
+            <div class="report-section" id="report-sec-cleaning" style="display: none;">
+              <h4><i data-lucide="sparkles" style="width: 14px; height: 14px;"></i> Data Clean & Quality</h4>
+              <div class="report-item"><strong>Cleaning Summary:</strong> <span id="rep-cleaning-text">-</span></div>
+              <div class="report-item"><strong>Data Quality Grade:</strong> <span id="rep-quality-grade-text">-</span></div>
+            </div>
+
+            <div class="report-section" id="report-sec-eda" style="display: none;">
+              <h4><i data-lucide="compass" style="width: 14px; height: 14px;"></i> Key Exploratory Metrics</h4>
+              <div class="report-item"><strong>Correlations & Associations:</strong> <span id="rep-eda-text">-</span></div>
+              <div class="report-item"><strong>Features Generated:</strong> <span id="rep-feature-text">-</span></div>
+            </div>
+
+            <div class="report-section" id="report-sec-business-answers" style="display: none;">
+              <h4><i data-lucide="help-circle" style="width: 14px; height: 14px;"></i> Business Answers</h4>
+              <div class="report-item" id="rep-answers-list">Answers will be generated in Step 8.</div>
+            </div>
+
+            <div class="report-section" id="report-sec-stats" style="display: none;">
+              <h4><i data-lucide="activity" style="width: 14px; height: 14px;"></i> Statistical Diagnostics</h4>
+              <div class="report-item" id="rep-stats-text">-</div>
+            </div>
+
+            <div class="report-section" id="report-sec-insights-rec" style="display: none;">
+              <h4><i data-lucide="lightbulb" style="width: 14px; height: 14px;"></i> Strategic Outcomes</h4>
+              <div class="report-item"><strong>Insights:</strong> <div id="rep-insights-text" style="margin-top: 4px; padding-left: 8px;">-</div></div>
+              <div class="report-item" style="margin-top: 10px;"><strong>Recommendations:</strong> <div id="rep-recommendations-text" style="margin-top: 4px; padding-left: 8px;">-</div></div>
+            </div>
+            
+          </div>
+        </section>
+        
+      </div>
+      
+    </main>
+  </div>
+
+  <!-- Application Logic Scripts -->
+  <script src="chart-utils.js"></script>
+  <script src="agent.js"></script>
+  <script src="app.js"></script>
+  
+  <script>
+    // Initialize Lucide Icons on DOM load
+    document.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

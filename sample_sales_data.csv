@@ -1,0 +1,21 @@
+Order_Date,Region,Product_Category,Unit_Price,Quantity,Unit_Cost,Sales,Profit
+2026-01-10,East,Electronics,$120.00,2,80,240,80
+2026-01-12,West,Electronics,$150.00,1,100,150,50
+2026-01-15,East,Furniture,$300.00,3,200,900,300
+2026-01-20,South,Office Supplies,$15.00,10,10,150,50
+2026-01-22,North,Office Supplies,$8.00,5,5,40,15
+2026-02-02,West,Furniture,$250.00,2,170,500,160
+2026-02-05,East,Electronics,$120.00,2,80,240,80
+2026-02-10,South,Electronics,$200.00,1,130,200,70
+2026-02-12,East,Furniture,,1,200,300,100
+2026-02-15,West,Office Supplies,$20.00,4,12,80,32
+2026-02-15,West,Office Supplies,$20.00,4,12,80,32
+2026-02-18,North,Electronics,$120.00,50,80,6000,2000
+2026-02-22,South,Furniture,$350.00,2,240,700,220
+2026-02-25,East,Office Supplies,$5.00,-2,3,-10,-4
+2026-02-28,North,Electronics,$120.00,3,80,360,120
+2026-03-01,West,Electronics,$150.00,2,100,300,100
+2026-03-05,East,Furniture,$280.00,1,190,280,90
+2026-03-10,South,Office Supplies,$12.00,8,8,96,32
+2026-03-14,North,Furniture,$400.00,1,280,400,120
+2026-03-18,West,Office Supplies,$25.00,5,15,125,50
